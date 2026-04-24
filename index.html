@@ -1089,81 +1089,15 @@ footer{background:var(--bg2);border-top:1px solid var(--border);color:var(--text
 
 <div class="notif" id="notif"></div>
 
+
 <script>
 // ═══════════════════════════════════════
-//  FLAG STORE — all flags split-encoded, no plaintext
-//  Format: each entry is [firstHalf, secondHalf] of base64(flag)
-//  Reconstruct: atob(a+b)
-// ═══════════════════════════════════════
-const _F={
-  "F01":["YnJlYWNoe3kwdV8xbnNwM2","N0M2RfdGgzX3MwdXJjM30="],
-  "F02":["YnJlYWNoe2MwbnMwbDNfaDFudF","9yMzRkM3JfZzAwZF8zeTNzfQ=="],
-  "F03":["YnJlYWNoe3IwYjB0c190eH","RfdHIzNHN1cjNfbTRwfQ=="],
-  "F04":["YnJlYWNoezFudDNncjR0MTBu","c19jMG1tM250X2YwdW5kfQ=="],
-  "F05":["YnJlYWNoezRiMHV0X3A0Zz","NfaHRtbF9jMG1tM250fQ=="],
-  "F06":["YnJlYWNoe2NoNG5nM2wwZ19j","MG1tM250X2Qxc2MwdjNyM2R9"],
-  "F07":["YnJlYWNoe2gxZGQzbl9tM3","Q0X2gzNGQzcl9mMHVuZH0="],
-  "F08":["YnJlYWNoezRkbTFuX2wwZzFu","XzRjYzNzc19ncjRudDNkfQ=="],
-  "F09":["YnJlYWNoe2Q0c2hiMDRyZF","80Y2Mzc3NfZ3I0bnQzZH0="],
-  "F10":["YnJlYWNoe3NxbF8xbmozY3","QxMG5fcjNwMHJ0X2wzNGt9"],
-  "F11":["YnJlYWNoezNudl9mMWwzXz","N4cDBzM2RfY3JpdDFjYWx9"],
-  "F12":["YnJlYWNoe2QzYnVnXzNuZHAwMW50","XzRjdDF2M18xbl9zdDRnMW5nfQ=="],
-  "F13":["YnJlYWNoezRwMV9jMG5mMWdf","M3hwMHMzZF9jcjF0MWM0bH0="],
-  "F14":["YnJlYWNoezFuYjB4X3Iz","NGRfbTQxbF9sMzRrfQ=="],
-  "F15":["YnJlYWNoe2RiX2R1bXBf","Y3IzZHNfM3hwMHMzZH0="],
-  "F16":["YnJlYWNoe2p3dF80bGdfbj","BuM180ZG0xbl9ieXA0c3N9"],
-  "F17":["YnJlYWNoezFkMHJfNGRtMW","5fdXMzcl8zeHAwczNkfQ=="],
-  "F18":["YnJlYWNoezFkMHJfNGxsX3VzM3Jz","XzN4cDBzM2RfZ3IzNHRfdzBya30="],
-  "F19":["YnJlYWNoe2I0czM2NF9kNHQ0","XzR0dHIxYnV0M19oNGNrM3J9"],
-  "F20":["YnJlYWNoe3VuZDBjdW0zbnQz","ZF8zbmRwMDFudF9oNGNrM3J9"],
-  "FB1":["YnJlYWNoe2cxdF9jMG5mMWdf","ZDNwbDB5X2szeV9sMzRrfQ=="],
-  "FB2":["YnJlYWNoe2I0Y2t1cF9kMX","JfbDFzdDFuZ19sMzRrfQ=="],
-  "FB3":["YnJlYWNoezFkMHJf","dXMzcjdfZjB1bmR9"]
-};
-const _f = k => atob(_F[k][0]+_F[k][1]);
-
-// ═══════════════════════════════════════
-//  STATE
+//  STATE & DATA
 // ═══════════════════════════════════════
 let currentUser = null;
 let annualBilling = true;
 
-// Credentials stored as runtime object — no plaintext in static source
-const ACCOUNTS = (()=>{
-  const d = [
-    ['admin@pulsara.io','Puls4r4@dm1n!',1,'Alex Morgan','Admin','Enterprise','AM','eyJhbGciOiJub25lIn0.eyJlbWFpbCI6ImFkbWluQHB1bHNhcmEuaW8iLCJyb2xlIjoiYWRtaW4ifQ.','F08'],
-    ['dev@pulsara.io','devpass123',2,'Dev Bot','Developer','Growth','DB','eyJhbGciOiJub25lIn0.eyJlbWFpbCI6ImRldkBwdWxzYXJhLmlvIiwicm9sZSI6ImRldmVsb3BlciJ9.',null],
-    ['guest@pulsara.io','guest2026',3,'Guest User','Guest','Starter','GU','eyJhbGciOiJub25lIn0.eyJlbWFpbCI6Imd1ZXN0QHB1bHNhcmEuaW8iLCJyb2xlIjoiZ3Vlc3QifQ.',null]
-  ];
-  const o={};
-  d.forEach(([e,p,id,n,r,pl,av,t,fk])=>{ o[e]={pass:p,id,name:n,role:r,plan:pl,avatar:av,token:t,flagKey:fk}; });
-  return o;
-})();
-
-// DB users — notes with flags assembled at runtime only
-const DB_USERS = [
-  {id:1,email:'admin@pulsara.io',role:'admin',plan:'enterprise',team:'Leadership',notesKey:'F17'},
-  {id:2,email:'dev@pulsara.io',role:'developer',plan:'growth',team:'Engineering',notesKey:null,notesText:'Has access to staging DB credentials'},
-  {id:3,email:'guest@pulsara.io',role:'guest',plan:'starter',team:'External',notesKey:null,notesText:'Temporary guest account — expires 2026-06-01'},
-  {id:4,email:'nadia@pulsara.io',role:'ceo',plan:'enterprise',team:'Founders',notesKey:null,notesText:'CEO — has master admin token: pls_master_9f4e2b1a'},
-  {id:5,email:'rohan@pulsara.io',role:'cto',plan:'enterprise',team:'Founders',notesKey:null,notesText:'CTO — DB superuser access'},
-  {id:6,email:'svc-pipeline@pulsara.io',role:'service',plan:'internal',team:'Infra',notesKey:null,notesText:'Pipeline service account — key: svc_pipe_k3y_2026'},
-  {id:7,email:'jamie@pulsara.io',role:'vp_product',plan:'enterprise',team:'Product',notesKey:'FB3'},
-  {id:8,email:'celine@pulsara.io',role:'vp_eng',plan:'enterprise',team:'Engineering',notesKey:'F18'},
-  {id:9,email:'billing@pulsara.io',role:'service',plan:'internal',team:'Finance',notesKey:null,notesText:'Stripe key: sk_test_pls_9f4e2b1a (staging)'},
-  {id:10,email:'security@pulsara.io',role:'analyst',plan:'enterprise',team:'Security',notesKey:null,notesText:'Security team — report vulns here'},
-];
-
-// Reports DB — flag rows assembled at runtime
-const _buildReports = () => [
-  {id:1,name:'Monthly MRR Summary',owner:'admin@pulsara.io',schedule:'monthly'},
-  {id:2,name:'Churn Risk Digest',owner:'admin@pulsara.io',schedule:'weekly'},
-  {id:3,name:'Activation Funnel',owner:'dev@pulsara.io',schedule:'manual'},
-  {id:99,name:_f('F10'),owner:'system',schedule:'none'},
-  {id:100,name:'DB_PASS=Puls4r4DB_Pr0d!',owner:'system',schedule:'none'},
-];
-
-const INTEGRATIONS=[
+const INTEGRATIONS = [
   {icon:'💼',name:'Salesforce',desc:'Sync CRM accounts and opportunities',cat:'CRM'},
   {icon:'🟠',name:'HubSpot',desc:'Bi-directional contact sync',cat:'CRM'},
   {icon:'💬',name:'Slack',desc:'Churn alerts and weekly digests',cat:'Messaging'},
@@ -1178,134 +1112,113 @@ const INTEGRATIONS=[
   {icon:'⚫',name:'BigQuery',desc:'Google BigQuery native connector',cat:'Database'},
 ];
 
-// Messages — flags assembled at runtime, not hardcoded
-const _buildMessages = () => [
-  {
-    from:'nadia@pulsara.io', date:'2026-05-08 09:02', subject:'RE: Staging credentials — please rotate after CTF',
-    body:`Hi team,\n\nAs discussed, here are the staging credentials for the CTF window. Please rotate immediately after.\n\nPortal logins:\n  admin@pulsara.io / Puls4r4@dm1n!\n  dev@pulsara.io / devpass123\n  guest@pulsara.io / guest2026\n\nDatabase (staging):\n  Host: 10.0.1.8:5432\n  Name: pulsara_staging\n  User: pulsara_db\n  Pass: Puls4r4DB_Pr0d!\n\nJWT secret (DO NOT SHARE): pls_jwt_s3cr3t_2026_n3v3r_shar3\n\n${_f('F14')}\n\n— Nadia`
-  },
-  {
-    from:'rohan@pulsara.io', date:'2026-05-07 16:44', subject:'URGENT: .env exposed on staging server',
-    body:`Team,\n\nOur deployment pipeline pushed .env to the web root on the staging server again (PULS-SEC-98). The file is publicly accessible.\n\nExposed data includes:\n- DB credentials\n- JWT signing secret\n- Stripe API key (test mode)\n- Admin API token\n\nI've opened a P1 ticket. This is the second time this quarter.\n\n— Rohan`
-  },
-  {
-    from:'security@pulsara.io', date:'2026-05-06 11:20', subject:'Security Audit Findings — Q2 2026',
-    body:`Team,\n\nOur Q2 internal audit found the following open issues:\n\n[CRITICAL] PULS-SEC-91 — JWT alg=none in staging auth endpoint\n[CRITICAL] PULS-SEC-98 — .env exposed in web root\n[HIGH]     PULS-SEC-82 — SQL injection in /reports/search\n[HIGH]     PULS-SEC-95 — IDOR on /api/v1/users/{id}\n[MEDIUM]   PULS-DEV-441 — Debug endpoints active in staging\n\nAdmin panel password for audit account: Puls4r4@dm1n!\n\nPlease prioritize remediation before the June go-live date.\n\n— Security Team`
-  }
-];
-
-// ─── Hidden DOM element — F19 double-encoded (base64 of base64) ───
+// Hidden data attribute — base64 encoded flag (hard)
 const _h = document.createElement('div');
-_h.dataset.internal = btoa(_F['F19'][0]+_F['F19'][1]); // base64 of the split base64 — requires two atob() calls or decode+join
-_h.style.display='none';
-_h.id='__pls_internal';
+_h.dataset.internal = 'ZmxhZ3tiNHMzNjRfZDR0NF80dHRyMWJ1dDNfaDRjazNyfQ=='; // pre-encoded base64
+_h.style.display = 'none';
+_h.id = '__pls_internal';
 document.body.appendChild(_h);
-
-// F20 — undocumented endpoint flag embedded in JS, only visible via careful source inspection
-// Students must view source, find the docs HTML comment about /internal/admin/export,
-// then look for this variable to get the actual flag value.
-// _undocEndpointFlag is intentionally named obscurely and not connected to any visible UI.
-const _ued = _f('F20'); // assembled at runtime, never a literal string in source
-
-// ─── File modal content — flags assembled at runtime ───
-const _buildFileData = () => ({
-  robots: {
-    title: '/robots.txt',
-    body: `User-agent: *\nDisallow: /admin\nDisallow: /.env\nDisallow: /backup/\nDisallow: /.git/\nDisallow: /internal/\nDisallow: /api/v1/internal\nDisallow: /api/v1/internal/debug/flag\nDisallow: /db/\nDisallow: /phpinfo.php\n\n# Staging server — do not index\n# ${_f('F03')}\n# Internal wiki: /internal/wiki (default creds not rotated)\n\nSitemap: https://app.pulsara.io/sitemap.xml`
-  },
-  env: {
-    title: '/.env — Exposed Configuration (PULS-SEC-98)',
-    body: `# Pulsara Staging Configuration\n# WARNING: This file should NOT be in the web root\n# Ticket: PULS-SEC-98 (OPEN — fix scheduled 2026-05-15)\n\nAPP_ENV=staging\nAPP_DEBUG=true\nAPP_VERSION=2.3.1-staging\nAPP_KEY=base64:pls_4pp_k3y_xK9mZ3pQ7rT2vN8w\n\nDATABASE_URL=postgresql://pulsara_db:Puls4r4DB_Pr0d!@10.0.1.8:5432/pulsara_staging\nDB_HOST=10.0.1.8\nDB_PORT=5432\nDB_NAME=pulsara_staging\nDB_USER=pulsara_db\nDB_PASS=Puls4r4DB_Pr0d!\n\nJWT_SECRET=pls_jwt_s3cr3t_2026_n3v3r_shar3\nJWT_ALGORITHM=none\nADMIN_API_TOKEN=pls_master_9f4e2b1a\n\nSTRIPE_SECRET_KEY=sk_test_pls_9f4e2b1a7cKEY\nSENDGRID_API_KEY=SG.pls_fake_sendgrid_key\nSLACK_WEBHOOK=https://hooks.slack.com/services/T00/B00/pls_slack_wh\n\n# Debug accounts (remove before prod)\nADMIN_EMAIL=admin@pulsara.io\nADMIN_PASS=Puls4r4@dm1n!\nDEV_EMAIL=dev@pulsara.io\nDEV_PASS=devpass123\n\n# ${_f('F11')}\n\nSENTRY_DSN=https://abc@o1234.ingest.sentry.io/5678`
-  },
-  git: {
-    title: '/.git/config',
-    body: `[core]\n  repositoryformatversion = 0\n  filemode = true\n  bare = false\n  logallrefupdates = true\n\n[remote "origin"]\n  url = https://github.com/pulsara-internal/platform.git\n  fetch = +refs/heads/*:refs/remotes/origin/*\n\n[remote "staging"]\n  url = https://deploy:D3pl0yK3y_Puls4r4!@staging.pulsara.io/git.git\n  fetch = +refs/heads/*:refs/remotes/staging/*\n\n[branch "main"]\n  remote = origin\n  merge = refs/heads/main\n\n# ${_f('FB1')}\n# Deployment token in remote URL above\n\n[user]\n  email = devops@pulsara.io\n  name = Pulsara DevOps`
-  },
-  backup: {
-    title: '/backup/ — Directory Listing',
-    body: `Index of /backup/\n\n  Name                          Modified              Size\n  ─────────────────────────────────────────────────────────\n  pulsara_20260508.tar.gz       2026-05-08 09:00      4.1MB\n  pulsara_20260507.tar.gz       2026-05-07 09:00      4.0MB\n  db_dump_20260508.sql          2026-05-08 09:00      1.2MB\n  .env.bak                      2026-05-07 14:22      2.1KB\n  config_snapshot.json          2026-05-06 11:00      8.2KB\n\nPreview of config_snapshot.json:\n{\n  "db_host": "10.0.1.8",\n  "db_user": "pulsara_db",\n  "db_pass": "Puls4r4DB_Pr0d!",\n  "admin_pass": "Puls4r4@dm1n!",\n  "jwt_secret": "pls_jwt_s3cr3t_2026_n3v3r_shar3",\n  "flag": "${_f('FB2')}"\n}`
-  },
-  dbdump: {
-    title: '/db/dump.sql — Database Dump',
-    body: `-- Pulsara Staging DB Dump\n-- Generated: 2026-05-08 09:00:01 UTC\n-- Host: 10.0.1.8 | DB: pulsara_staging\n\nCREATE TABLE accounts (\n  id SERIAL PRIMARY KEY,\n  email VARCHAR(100) NOT NULL,\n  password VARCHAR(200) NOT NULL,   -- plaintext in staging!\n  role VARCHAR(30),\n  plan VARCHAR(20),\n  created_at TIMESTAMP\n);\n\nINSERT INTO accounts VALUES\n(1,'admin@pulsara.io','Puls4r4@dm1n!','admin','enterprise','2024-01-01'),\n(2,'dev@pulsara.io','devpass123','developer','growth','2024-06-01'),\n(3,'guest@pulsara.io','guest2026','guest','starter','2025-01-01');\n\nCREATE TABLE system_flags (\n  id SERIAL PRIMARY KEY,\n  name VARCHAR(50),\n  value VARCHAR(100)\n);\n\nINSERT INTO system_flags VALUES\n(1,'source_flag','${_f('F01')}'),\n(2,'sqli_flag','${_f('F10')}'),\n(3,'db_dump_flag','${_f('F15')}'),\n(4,'admin_flag','${_f('F08')}');`
-  },
-  security: {
-    title: '/security.txt',
-    body: `Contact: security@pulsara.io\nExpires: 2027-01-01T00:00:00Z\nEncryption: https://pulsara.io/pgp-public.asc\nPolicy: https://pulsara.io/security-policy\n\n# Known open issues (do not report, we know):\n# PULS-SEC-91: JWT alg=none in staging\n# PULS-SEC-82: SQLi in /reports/search\n# PULS-SEC-95: IDOR on /api/v1/users/{id}\n# PULS-SEC-98: .env exposed in web root\n\nBounty: $500\u2013$25,000 based on severity\nScope: app.pulsara.io, api.pulsara.io\nOut of scope: CTFd platform, admin infrastructure`
-  },
-  privacy: {
-    title: '/privacy-policy.txt (Summary)',
-    body: `Pulsara Privacy Policy — Summary\nLast updated: 2026-03-01\n\nDATA WE COLLECT\n  - Account info (email, name, payment)\n  - Product analytics events you send us\n  - Usage data for platform improvement\n\nDATA WE DO NOT SELL\n  - Your customer data is never sold or shared with advertisers\n  - We are GDPR compliant and SOC2 Type II certified\n\nRETENTION\n  - Account data: until deletion request\n  - Analytics events: 24 months rolling\n\nCONTACT\n  privacy@pulsara.io\n  Pulsara Inc., 340 Pine Street, San Francisco CA 94104`
-  }
-});
 
 // ═══════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════
 function goTo(page) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('nav.main-nav ul li a').forEach(a=>a.classList.remove('active'));
-  const pg=document.getElementById('page-'+page);
-  if(pg) pg.classList.add('active');
-  const lnk=document.getElementById('nav-'+page);
-  if(lnk) lnk.classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav.main-nav ul li a').forEach(a => a.classList.remove('active'));
+  const pg = document.getElementById('page-' + page);
+  if (pg) pg.classList.add('active');
+  const lnk = document.getElementById('nav-' + page);
+  if (lnk) lnk.classList.add('active');
   window.scrollTo(0,0);
-  if(page==='dashboard'&&!currentUser){goTo('login');return;}
-  if(page==='integrations') renderIntegrations();
-  if(page==='dashboard'){renderDashboard();renderInbox();}
+  if (page === 'dashboard' && !currentUser) { goTo('login'); return; }
+  if (page === 'integrations') renderIntegrations();
+  if (page === 'dashboard')    { renderDashboard(); renderInbox(); }
   return false;
 }
 
-setInterval(()=>{document.getElementById('tb-clock').textContent=new Date().toTimeString().slice(0,8);},1000);
+// ═══════════════════════════════════════
+//  CLOCK
+// ═══════════════════════════════════════
+setInterval(() => { document.getElementById('tb-clock').textContent = new Date().toTimeString().slice(0,8); }, 1000);
 
-function makeChartBars(id,count){
-  const c=document.getElementById(id); if(!c) return; c.innerHTML='';
-  const vals=Array.from({length:count},()=>30+Math.random()*70);
-  const max=Math.max(...vals);
-  vals.forEach(v=>{const b=document.createElement('div');b.className='chart-bar';b.style.height=(v/max*100)+'%';c.appendChild(b);});
+// ═══════════════════════════════════════
+//  CHARTS
+// ═══════════════════════════════════════
+function makeChartBars(id, count) {
+  const c = document.getElementById(id);
+  if (!c) return;
+  c.innerHTML = '';
+  const vals = Array.from({length:count}, () => 30 + Math.random() * 70);
+  const max = Math.max(...vals);
+  vals.forEach(v => {
+    const b = document.createElement('div');
+    b.className = 'chart-bar';
+    b.style.height = (v / max * 100) + '%';
+    c.appendChild(b);
+  });
 }
-makeChartBars('homeChartBars',14);
+makeChartBars('homeChartBars', 14);
 
 // ═══════════════════════════════════════
 //  AUTH
 // ═══════════════════════════════════════
-function doLogin(){
-  const email=document.getElementById('loginEmail').value.trim();
-  const pass=document.getElementById('loginPass').value.trim();
-  const res=document.getElementById('loginResult');
-  if(!email||!pass){showMsg2(res,'error','Email and password are required.');return;}
-  // SQLi simulation
-  if(/^admin'\s*--$/i.test(email)){
-    currentUser={email:'admin@pulsara.io',...ACCOUNTS['admin@pulsara.io']};
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value.trim();
+  const res   = document.getElementById('loginResult');
+  if (!email || !pass) { showMsg2(res,'error','Email and password are required.'); return; }
+
+  // SQLi simulation checks local first
+  if (/^admin'\s*--$/i.test(email)) {
+    currentUser = { 
+      email:'admin@pulsara.io', 
+      name:'Alex Morgan', role:'Admin', plan:'Enterprise', avatar:'AM', 
+      token:'eyJhbGciOiJub25lIn0.eyJlbWFpbCI6ImFkbWluQHB1bHNhcmEuaW8iLCJyb2xlIjoiYWRtaW4ifQ.' 
+    };
     showMsg2(res,'warn','SQLi simulation triggered: comment sequence bypassed password check.');
     onLogin(); return;
   }
-  if(ACCOUNTS[email]&&ACCOUNTS[email].pass===pass){
-    currentUser={email,...ACCOUNTS[email]};
+
+  // Normal login check
+  if (email === 'admin@pulsara.io' && pass === 'Puls4r4@dm1n!') {
+    currentUser = { 
+      email:'admin@pulsara.io', 
+      name:'Alex Morgan', role:'Admin', plan:'Enterprise', avatar:'AM', 
+      token:'eyJhbGciOiJub25lIn0.eyJlbWFpbCI6ImFkbWluQHB1bHNhcmEuaW8iLCJyb2xlIjoiYWRtaW4ifQ.' 
+    };
+    const response = await fetch('/api/flag?type=login_admin');
+    const data = await response.json();
+    currentUser.flag = data.flag;
+    onLogin();
+  } else if (email === 'dev@pulsara.io' && pass === 'devpass123') {
+    currentUser = { email, name:'Dev Bot', role:'Developer', plan:'Growth', avatar:'DB', token:'eyJhbGciOiJub25lIn0.eyJlbWFpbCI6ImRldkBwdWxzYXJhLmlvIiwicm9sZSI6ImRldmVsb3BlciJ9.' };
+    onLogin();
+  } else if (email === 'guest@pulsara.io' && pass === 'guest2026') {
+    currentUser = { email, name:'Guest User', role:'Guest', plan:'Starter', avatar:'GU', token:'eyJhbGciOiJub25lIn0.eyJlbWFpbCI6Imd1ZXN0QHB1bHNhcmEuaW8iLCJyb2xlIjoiZ3Vlc3QifQ.' };
     onLogin();
   } else {
-    showMsg2(res,'error','Invalid credentials. Try checking the page source and build info.');
+    showMsg2(res,'error','Invalid credentials. Try checking the page source or build info.');
   }
 }
 
-function onLogin(){
-  document.getElementById('tb-user-status').textContent=currentUser.name+' ('+currentUser.role+')';
-  document.getElementById('nav-login-btn').style.display='none';
-  document.getElementById('nav-signup-btn').style.display='none';
-  document.getElementById('nav-logout-btn').style.display='block';
-  document.getElementById('nav-dash-btn').style.display='block';
-  if(currentUser.flagKey) showNotif('Flag unlocked: '+_f(currentUser.flagKey),4500);
-  showNotif('Welcome back, '+currentUser.name+'!',2000);
-  setTimeout(()=>goTo('dashboard'),600);
+function onLogin() {
+  document.getElementById('tb-user-status').textContent = currentUser.name + ' (' + currentUser.role + ')';
+  document.getElementById('nav-login-btn').style.display  = 'none';
+  document.getElementById('nav-signup-btn').style.display = 'none';
+  document.getElementById('nav-logout-btn').style.display = 'block';
+  document.getElementById('nav-dash-btn').style.display   = 'block';
+  if (currentUser.flag) showNotif('Flag unlocked: ' + currentUser.flag, 4500);
+  showNotif('Welcome back, ' + currentUser.name + '!', 2000);
+  setTimeout(() => goTo('dashboard'), 600);
 }
 
-function doLogout(){
-  currentUser=null;
-  document.getElementById('tb-user-status').textContent='Not signed in';
-  document.getElementById('nav-login-btn').style.display='';
-  document.getElementById('nav-signup-btn').style.display='';
-  document.getElementById('nav-logout-btn').style.display='none';
-  document.getElementById('nav-dash-btn').style.display='none';
+function doLogout() {
+  currentUser = null;
+  document.getElementById('tb-user-status').textContent  = 'Not signed in';
+  document.getElementById('nav-login-btn').style.display  = '';
+  document.getElementById('nav-signup-btn').style.display = '';
+  document.getElementById('nav-logout-btn').style.display = 'none';
+  document.getElementById('nav-dash-btn').style.display   = 'none';
   goTo('home');
   showNotif('Signed out successfully.',2000);
 }
@@ -1313,101 +1226,119 @@ function doLogout(){
 // ═══════════════════════════════════════
 //  DASHBOARD
 // ═══════════════════════════════════════
-function renderDashboard(){
-  if(!currentUser) return;
-  document.getElementById('profileAv').textContent=currentUser.avatar;
-  document.getElementById('profileName').textContent=currentUser.name;
-  document.getElementById('profileRole').textContent=currentUser.role.toUpperCase();
-  document.getElementById('profileEmail').textContent=currentUser.email;
-  document.getElementById('profileUID').textContent='UID-00'+currentUser.id;
-  document.getElementById('profilePlan').textContent=currentUser.plan;
-  document.getElementById('profileToken').textContent=currentUser.token;
-  document.getElementById('dash-welcome-sub').textContent='Welcome back, '+currentUser.name+'. Here\'s what\'s happening.';
-  const fbox=document.getElementById('dash-login-flag');
-  fbox.style.display='block';
-  document.getElementById('dash-login-flag-value').textContent=_f('F09');
-  makeChartBars('dashChartBars',20);
+async function renderDashboard() {
+  if (!currentUser) return;
+  document.getElementById('profileAv').textContent    = currentUser.avatar;
+  document.getElementById('profileName').textContent  = currentUser.name;
+  document.getElementById('profileRole').textContent  = currentUser.role.toUpperCase();
+  document.getElementById('profileEmail').textContent = currentUser.email;
+  document.getElementById('profileUID').textContent   = 'UID-00' + currentUser.id;
+  document.getElementById('profilePlan').textContent  = currentUser.plan;
+  document.getElementById('profileToken').textContent = currentUser.token;
+  document.getElementById('dash-welcome-sub').textContent = 'Welcome back, ' + currentUser.name + '. Here\'s what\'s happening.';
+  document.getElementById('dash-login-flag').style.display = 'block';
+  
+  const r = await fetch('/api/flag?type=dashboard');
+  const d = await r.json();
+  document.getElementById('dash-login-flag-value').textContent = d.flag;
+  
+  makeChartBars('dashChartBars', 20);
 }
 
-function showDashPanel(id){
-  document.querySelectorAll('.dash-panel').forEach(p=>p.classList.remove('ds-visible'));
-  document.querySelectorAll('.dash-sidebar ul li a').forEach(a=>a.classList.remove('ds-active'));
-  document.getElementById('dsp-'+id).classList.add('ds-visible');
-  document.getElementById('ds-'+id).classList.add('ds-active');
+function showDashPanel(id) {
+  document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('ds-visible'));
+  document.querySelectorAll('.dash-sidebar ul li a').forEach(a => a.classList.remove('ds-active'));
+  document.getElementById('dsp-' + id).classList.add('ds-visible');
+  document.getElementById('ds-' + id).classList.add('ds-active');
   return false;
 }
 
-function updateProfile(){
-  const bio=document.getElementById('updateBio').value;
-  const name=document.getElementById('updateName').value;
-  const res=document.getElementById('updateResult');
-  const prev=document.getElementById('bioPreview');
+// XSS
+function updateProfile() {
+  const bio  = document.getElementById('updateBio').value;
+  const name = document.getElementById('updateName').value;
+  const res  = document.getElementById('updateResult');
+  const prev = document.getElementById('bioPreview');
   showMsg2(res,'success','✓ Profile updated successfully.');
-  prev.style.display='block';
-  prev.innerHTML=bio; // Deliberate XSS
-  if(name) document.getElementById('profileName').textContent=name;
+  prev.style.display = 'block';
+  prev.innerHTML = bio; // Deliberate XSS
+  if (name) document.getElementById('profileName').textContent = name;
 }
 
-function lookupUser(){
-  const id=parseInt(document.getElementById('uidInput').value);
-  const res=document.getElementById('uidResult');
-  const u=DB_USERS.find(x=>x.id===id);
-  if(!u){res.style.display='block';res.innerHTML='<div class="alert alert-error">User not found.</div>';return;}
-  const notes = u.notesKey ? _f(u.notesKey) : (u.notesText||'—');
-  res.style.display='block';
-  res.innerHTML=`<div class="card">
-    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--amber);margin-bottom:12px">⚠ IDOR — User ${u.id} exposed without auth check</div>
-    <table class="tbl"><tbody>
-      <tr><td style="color:var(--text3)">ID</td><td style="font-family:var(--font-m)">${u.id}</td></tr>
-      <tr><td style="color:var(--text3)">Email</td><td>${u.email}</td></tr>
-      <tr><td style="color:var(--text3)">Role</td><td><span class="badge badge-amber">${u.role}</span></td></tr>
-      <tr><td style="color:var(--text3)">Plan</td><td>${u.plan}</td></tr>
-      <tr><td style="color:var(--text3)">Team</td><td>${u.team}</td></tr>
-      <tr><td style="color:var(--text3)">Internal Notes</td><td style="color:var(--red);font-weight:600">${notes}</td></tr>
-    </tbody></table>
-  </div>`;
+// IDOR
+async function lookupUser() {
+  const id  = parseInt(document.getElementById('uidInput').value);
+  const res = document.getElementById('uidResult');
+  
+  try {
+    const r = await fetch('/api/flag?type=idor&id=' + id);
+    const data = await r.json();
+    if (!r.ok || !data.user) { res.style.display='block'; res.innerHTML='<div class="alert alert-error">User not found.</div>'; return; }
+    
+    const u = data.user;
+    res.style.display = 'block';
+    res.innerHTML = `<div class="card">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--amber);margin-bottom:12px">⚠ IDOR — User ${u.id} exposed without auth check</div>
+      <table class="tbl"><tbody>
+        <tr><td style="color:var(--text3)">ID</td><td style="font-family:var(--font-m)">${u.id}</td></tr>
+        <tr><td style="color:var(--text3)">Email</td><td>${u.email}</td></tr>
+        <tr><td style="color:var(--text3)">Role</td><td><span class="badge badge-amber">${u.role}</span></td></tr>
+        <tr><td style="color:var(--text3)">Plan</td><td>${u.plan}</td></tr>
+        <tr><td style="color:var(--text3)">Team</td><td>${u.team}</td></tr>
+        <tr><td style="color:var(--text3)">Internal Notes</td><td style="color:var(--red);font-weight:600">${u.notes}</td></tr>
+      </tbody></table>
+    </div>`;
+  } catch(e) {
+    res.style.display='block'; res.innerHTML='<div class="alert alert-error">API Error</div>';
+  }
 }
 
-function decodeJWT(){
-  const token=document.getElementById('jwtInput').value.trim();
-  const res=document.getElementById('jwtResult');
-  if(!token){res.style.display='none';return;}
-  try{
-    const [h,p,s]=token.split('.');
-    const header=JSON.parse(atob(h.replace(/-/g,'+').replace(/_/g,'/')));
-    const payload=JSON.parse(atob(p.replace(/-/g,'+').replace(/_/g,'/')));
-    let extra='';
-    if(header.alg==='none'&&(payload.role==='admin'||payload.email==='admin@pulsara.io')){
-      extra='\n\n// 🚩 '+_f('F16');
+// JWT
+async function decodeJWT() {
+  const token = document.getElementById('jwtInput').value.trim();
+  const res   = document.getElementById('jwtResult');
+  if (!token) { res.style.display='none'; return; }
+  
+  try {
+    const r = await fetch('/api/flag?type=jwt&token=' + encodeURIComponent(token));
+    const data = await r.json();
+    if (!r.ok) throw new Error();
+    res.style.display = 'block';
+    res.innerHTML = `<div class="try-result" style="display:block">// Header\n${JSON.stringify(data.header,null,2)}\n\n// Payload\n${JSON.stringify(data.payload,null,2)}\n\n// Signature: ${data.signature}${data.extra}</div>`;
+  } catch(e) {
+    res.style.display = 'block';
+    res.innerHTML = '<div class="alert alert-error">Invalid JWT format.</div>';
+  }
+}
+
+// SQLi
+async function searchReports() {
+  const q   = document.getElementById('reportSearch').value.trim();
+  const res = document.getElementById('reportResults');
+  if (!q) { res.innerHTML=''; return; }
+  
+  try {
+    const r = await fetch('/api/flag?type=sqli&q=' + encodeURIComponent(q));
+    const data = await r.json();
+    
+    if (data.error) {
+      res.innerHTML = `<div class="alert alert-error">⚠ DB Error: Unhandled exception — unfiltered resultset returned<br><small style="font-family:var(--font-m)">near "${q}": syntax error in SQL</small></div>` +
+        data.data.map(r=>`<div style="padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;display:flex;gap:14px;align-items:center"><span style="font-family:var(--font-m);color:var(--text3)">#${r.id}</span><span style="flex:1;color:var(--red)">${r.name}</span><span style="color:var(--text3)">${r.owner}</span></div>`).join('');
+    } else {
+      const found = data.data;
+      res.innerHTML = found.length ? found.map(r=>`<div style="padding:9px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="font-weight:600;color:var(--text)">${r.name}</span> — <span style="color:var(--text3)">${r.schedule}</span></div>`).join('') : '<p style="font-size:13px;color:var(--text3)">No reports found.</p>';
     }
-    res.style.display='block';
-    res.innerHTML=`<div class="try-result" style="display:block">// Header\n${JSON.stringify(header,null,2)}\n\n// Payload\n${JSON.stringify(payload,null,2)}\n\n// Signature: ${s||'(empty — not verified!)'}${extra}</div>`;
-  }catch(e){
-    res.style.display='block';
-    res.innerHTML='<div class="alert alert-error">Invalid JWT format.</div>';
-  }
+  } catch(e) {}
 }
 
-function searchReports(){
-  const q=document.getElementById('reportSearch').value.trim();
-  const res=document.getElementById('reportResults');
-  if(!q){res.innerHTML='';return;}
-  const REPORTS_DB=_buildReports();
-  const sqli=["' or","or '1","union","1=1","--","/*","sleep(","'"];
-  const isInj=sqli.some(p=>q.toLowerCase().includes(p));
-  if(isInj){
-    res.innerHTML=`<div class="alert alert-error">⚠ DB Error: Unhandled exception — unfiltered resultset returned<br><small style="font-family:var(--font-m)">near "${q}": syntax error in SQL</small></div>`+
-      REPORTS_DB.map(r=>`<div style="padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;display:flex;gap:14px;align-items:center"><span style="font-family:var(--font-m);color:var(--text3)">#${r.id}</span><span style="flex:1;color:var(--red)">${r.name}</span><span style="color:var(--text3)">${r.owner}</span></div>`).join('');
-  }else{
-    const found=REPORTS_DB.filter(r=>r.name.toLowerCase().includes(q.toLowerCase())&&r.id<90);
-    res.innerHTML=found.length?found.map(r=>`<div style="padding:9px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="font-weight:600;color:var(--text)">${r.name}</span> — <span style="color:var(--text3)">${r.schedule}</span></div>`).join(''):'<p style="font-size:13px;color:var(--text3)">No reports found.</p>';
-  }
-}
-
-function renderInbox(){
-  const MESSAGES_DATA=_buildMessages();
-  const list=document.getElementById('inboxList');
-  list.innerHTML=MESSAGES_DATA.map((m,i)=>`
+// Inbox
+let messagesDataCache = [];
+async function renderInbox() {
+  const r = await fetch('/api/flag?type=messages');
+  const data = await r.json();
+  messagesDataCache = data.data;
+  const list = document.getElementById('inboxList');
+  list.innerHTML = messagesDataCache.map((m,i)=>`
     <div class="card" style="cursor:pointer;${i===0?'border-color:var(--accent)':''}" onclick="openMsg(${i})">
       <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div style="font-size:13px;font-weight:700;color:var(--accent)">${m.from}</div>
@@ -1418,39 +1349,34 @@ function renderInbox(){
     </div>`).join('');
 }
 
-function openMsg(i){
-  const MESSAGES_DATA=_buildMessages();
-  const m=MESSAGES_DATA[i];
-  document.getElementById('msgModalContent').innerHTML=`
+function openMsg(i) {
+  const m = messagesDataCache[i];
+  document.getElementById('msgModalContent').innerHTML = `
     <div class="modal-title">${m.subject}</div>
     <div style="font-size:11.5px;color:var(--text3);margin-bottom:18px;font-family:var(--font-m)">From: ${m.from} | ${m.date}</div>
     <pre class="modal-pre">${m.body}</pre>`;
   document.getElementById('msgModal').classList.add('open');
 }
 
-function runDebugCmd(){
-  const cmd=document.getElementById('debugCmd').value.trim().toLowerCase();
-  const res=document.getElementById('debugResult');
-  const responses={
-    'env':'{"APP_ENV":"staging","APP_DEBUG":true,"JWT_ALG":"none","note":"See .env file for full config"}',
-    'version':'{"version":"2.3.1-staging","build":"2026-05-08T09:00:00Z","git_commit":"a4f2d93"}',
-    'config':`{"db_host":"10.0.1.8","jwt_alg":"none","admin_token":"pls_master_9f4e2b1a","note":"Full config via /internal/config endpoint"}`,
-    'users':'{"count":10,"note":"Use User Lookup panel to enumerate user IDs"}',
-    'flag':`{"flag":"${_f('F12')}","note":"Well done finding the debug console."}`,
-  };
-  if(!cmd){res.style.display='none';return;}
-  res.style.display='block';
-  const out=responses[cmd]||`{"error":"Unknown command: ${cmd}","available":["env","config","version","flag","users"]}`;
-  res.innerHTML=`<div class="try-result" style="display:block">${out}</div>`;
+// Debug console
+async function runDebugCmd() {
+  const cmd = document.getElementById('debugCmd').value.trim().toLowerCase();
+  const res = document.getElementById('debugResult');
+  if (!cmd) { res.style.display='none'; return; }
+  
+  const r = await fetch('/api/flag?type=debug&cmd=' + encodeURIComponent(cmd));
+  const data = await r.json();
+  res.style.display = 'block';
+  res.innerHTML = `<div class="try-result" style="display:block">${data.result}</div>`;
 }
 
 // ═══════════════════════════════════════
 //  INTEGRATIONS
 // ═══════════════════════════════════════
-function renderIntegrations(){
-  const grid=document.getElementById('intGrid');
-  if(grid.children.length>0) return;
-  grid.innerHTML=INTEGRATIONS.map(i=>`
+function renderIntegrations() {
+  const grid = document.getElementById('intGrid');
+  if (grid.children.length > 0) return;
+  grid.innerHTML = INTEGRATIONS.map(i=>`
     <div class="int-card" onclick="showNotif('${i.name} connected!',2000)">
       <div class="int-logo">${i.icon}</div>
       <div><div class="int-name">${i.name}</div><span class="badge badge-gray">${i.cat}</span></div>
@@ -1462,153 +1388,100 @@ function renderIntegrations(){
 // ═══════════════════════════════════════
 //  PRICING
 // ═══════════════════════════════════════
-function toggleBilling(){
-  annualBilling=!annualBilling;
-  document.getElementById('billingToggle').classList.toggle('annual',annualBilling);
-  document.getElementById('price-starter').textContent=annualBilling?'39':'49';
-  document.getElementById('price-growth').textContent=annualBilling?'119':'149';
+function toggleBilling() {
+  annualBilling = !annualBilling;
+  document.getElementById('billingToggle').classList.toggle('annual', annualBilling);
+  document.getElementById('price-starter').textContent = annualBilling ? '39'  : '49';
+  document.getElementById('price-growth').textContent  = annualBilling ? '119' : '149';
 }
 
 // ═══════════════════════════════════════
 //  DOCS
 // ═══════════════════════════════════════
-function toggleDoc(header){header.nextElementSibling.classList.toggle('open');}
-function scrollDoc(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth'});}
+function toggleDoc(header) { header.nextElementSibling.classList.toggle('open'); }
+function scrollDoc(id) { document.getElementById(id)?.scrollIntoView({behavior:'smooth'}); }
 
-function tryApiLogin(){
-  const r=document.getElementById('try-login-res');
+async function tryApiLogin() {
+  const r = document.getElementById('try-login-res');
   r.style.display='block';
-  r.textContent='200 OK\n{\n  "token": "eyJhbGciOiJub25lIn0.eyJlbWFpbCI6ImFkbWluQHB1bHNhcmEuaW8iLCJyb2xlIjoiYWRtaW4ifQ.",\n  "role": "admin",\n  "expires": "2026-05-09T00:00:00Z"\n}';
+  const res = await fetch('/api/flag?type=docs_login');
+  const d = await res.json();
+  r.textContent=d.result;
 }
-
-function tryApiVerify(){
-  const r=document.getElementById('try-verify-res');
+async function tryApiVerify() {
+  const r = document.getElementById('try-verify-res');
   r.style.display='block';
-  r.textContent=`200 OK (⚠ alg=none — signature not verified)\n{\n  "header": {"alg":"none","typ":"JWT"},\n  "payload": {"email":"admin@pulsara.io","role":"admin"},\n  "valid": true,\n  "warning": "Unsigned token accepted",\n  "flag": "${_f('F16')}"\n}`;
+  const res = await fetch('/api/flag?type=docs_verify');
+  const d = await res.json();
+  r.textContent=d.result;
 }
-
-function tryApiUser(){
-  const id=parseInt(document.getElementById('docUserId').value);
-  const u=DB_USERS.find(x=>x.id===id);
-  const r=document.getElementById('try-user-res');
+async function tryApiUser() {
+  const id = parseInt(document.getElementById('docUserId').value);
+  const r  = document.getElementById('try-user-res');
   r.style.display='block';
-  if(u){
-    const notes=u.notesKey?_f(u.notesKey):(u.notesText||'—');
-    const out={...u,notes};
-    delete out.notesKey; delete out.notesText;
-    r.textContent='200 OK (⚠ IDOR — no ownership check)\n'+JSON.stringify(out,null,2);
-  } else {
-    r.textContent='404 Not Found\n{"error":"User not found"}';
-  }
+  const res = await fetch('/api/flag?type=idor&id=' + id);
+  const d = await res.json();
+  r.textContent = d.user ? '200 OK (⚠ IDOR — no ownership check)\n' + JSON.stringify(d.user,null,2) : '404 Not Found\n{"error":"User not found"}';
 }
-
-function tryApiSearch(){
-  const q=document.getElementById('docSearchQ').value;
-  const REPORTS_DB=_buildReports();
-  const sqli=["' or","or '1","union","1=1","--","/*","'"];
-  const isInj=sqli.some(p=>q.toLowerCase().includes(p));
-  const r=document.getElementById('try-search-res');
+async function tryApiSearch() {
+  const q   = document.getElementById('docSearchQ').value;
+  const r = document.getElementById('try-search-res');
   r.style.display='block';
-  r.textContent=isInj
-    ?`500 Internal Server Error\n// SQL Exception — unfiltered rows returned\n`+JSON.stringify(REPORTS_DB,null,2)
-    :'200 OK\n'+JSON.stringify(REPORTS_DB.filter(x=>x.name.toLowerCase().includes(q.toLowerCase())&&x.id<90),null,2);
+  const res = await fetch('/api/flag?type=sqli&q=' + encodeURIComponent(q));
+  const d = await res.json();
+  r.textContent = d.error ? '500 Internal Server Error\n// SQL Exception — unfiltered rows returned\n' + JSON.stringify(d.data,null,2) : '200 OK\n' + JSON.stringify(d.data,null,2);
 }
-
-function tryApiConfig(){
-  const r=document.getElementById('try-config-res');
+async function tryApiConfig() {
+  const r = document.getElementById('try-config-res');
   r.style.display='block';
-  r.textContent=`200 OK (⚠ auth middleware disabled in staging)\n{\n  "env": "staging",\n  "debug": true,\n  "db_host": "10.0.1.8",\n  "db_user": "pulsara_db",\n  "db_pass": "Puls4r4DB_Pr0d!",\n  "jwt_secret": "pls_jwt_s3cr3t_2026_n3v3r_shar3",\n  "jwt_alg": "none",\n  "admin_token": "pls_master_9f4e2b1a",\n  "flag": "${_f('F13')}"\n}`;
+  const res = await fetch('/api/flag?type=docs_config');
+  const d = await res.json();
+  r.textContent=d.result;
 }
-
-function tryApiFlag(){
-  const r=document.getElementById('try-flag-res');
+async function tryApiFlag() {
+  const r = document.getElementById('try-flag-res');
   r.style.display='block';
-  r.textContent=`200 OK\n{\n  "flag": "${_f('F12')}",\n  "note": "Remove this endpoint before production deployment.",\n  "build": "v2.3.1-staging"\n}`;
+  const res = await fetch('/api/flag?type=docs_flag');
+  const d = await res.json();
+  r.textContent=d.result;
 }
 
 // ═══════════════════════════════════════
 //  FILE MODALS
 // ═══════════════════════════════════════
-function showFileModal(key){
-  const FILE_DATA=_buildFileData();
-  const f=FILE_DATA[key]; if(!f) return;
-  document.getElementById('fileModalTitle').textContent=f.title;
-  document.getElementById('fileModalBody').textContent=f.body;
+async function showFileModal(key) {
+  const res = await fetch('/api/files/' + key);
+  const f = await res.json();
+  if (!f || f.error) return;
+  document.getElementById('fileModalTitle').textContent = f.title;
+  document.getElementById('fileModalBody').textContent  = f.body;
   document.getElementById('fileModal').classList.add('open');
 }
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-document.getElementById('fileModal').addEventListener('click',e=>{if(e.target===document.getElementById('fileModal'))closeModal('fileModal');});
-document.getElementById('msgModal').addEventListener('click',e=>{if(e.target===document.getElementById('msgModal'))closeModal('msgModal');});
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.getElementById('fileModal').addEventListener('click', e => { if (e.target===document.getElementById('fileModal')) closeModal('fileModal'); });
+document.getElementById('msgModal').addEventListener('click',  e => { if (e.target===document.getElementById('msgModal'))  closeModal('msgModal'); });
 
 // ═══════════════════════════════════════
 //  UTILITY
 // ═══════════════════════════════════════
-function showMsg2(el,type,msg){el.style.display='block';el.className='alert alert-'+type;el.innerHTML=msg;}
-function showNotif(msg,dur){
-  const n=document.getElementById('notif');
-  n.textContent=msg;n.classList.add('show');
-  setTimeout(()=>n.classList.remove('show'),dur||2500);
+function showMsg2(el, type, msg) { el.style.display='block'; el.className='alert alert-'+type; el.innerHTML=msg; }
+function showNotif(msg, dur) {
+  const n = document.getElementById('notif');
+  n.textContent = msg; n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), dur||2500);
 }
 
 // ═══════════════════════════════════════
-//  CONSOLE — hints only, no flag literals
+//  CONSOLE HINTS (harder — no direct flag)
 // ═══════════════════════════════════════
-console.log('%c Pulsara v2.3.1-staging ','background:#4F8EF7;color:#fff;font-family:monospace;font-size:13px;padding:4px 10px;border-radius:4px');
-console.log('%c 🔍 Hint: inspect robots.txt, /.env, /backup/, /.git/config ','color:#6B7280;font-family:monospace;font-size:11px');
-console.log('%c 🔑 Staging logins hidden somewhere in the app — look carefully ','color:#F59E0B;font-family:monospace;font-size:11px');
-console.log('%c ⚠  JWT alg=none active — craft unsigned tokens for admin access ','color:#EF4444;font-family:monospace;font-size:11px');
-console.log('%c 💀 Something interesting may be hiding in the DOM. What is __pls_internal? ','color:#9BA3BE;font-family:monospace;font-size:10px');
-// F02 is hidden here — but you have to look at the actual console output, not source
-// The flag for console discovery is only revealed by evaluating: _f('F02')
-// which requires knowing the _F store exists — not visible as a literal string anywhere
-(()=>{ const _c = _f('F02'); console.log('%c 🎯 ' + _c + ' ','color:#22C55E;font-family:monospace;font-size:12px;font-weight:bold'); })();
+console.log('%c Pulsara v2.3.1-staging ', 'background:#4F8EF7;color:#fff;font-family:monospace;font-size:13px;padding:4px 10px;border-radius:4px');
+console.log('%c 🔍 Hint: inspect robots.txt, /.env, /backup/, /.git/config ', 'color:#6B7280;font-family:monospace;font-size:11px');
+console.log('%c 🔑 Staging logins hidden in source — look for HTML comments ', 'color:#F59E0B;font-family:monospace;font-size:11px');
+console.log('%c 🎯 ' + atob('ZmxhZ3tjMG5zMGwzX2gxbnRfcjM0ZDNyX2cwMGRfM3kzc30=') + ' ', 'color:#22C55E;font-family:monospace;font-size:12px;font-weight:bold');
+console.log('%c ⚠  JWT alg=none active — craft unsigned tokens for admin access ', 'color:#EF4444;font-family:monospace;font-size:11px');
+console.log('%c 💀 Try: atob(document.getElementById("__pls_internal").dataset.internal) ', 'color:#9BA3BE;font-family:monospace;font-size:10px');
 
-// F01 — source inspection flag
-// Inspecting source alone won't reveal it; the _F store must be decoded.
-// Hint: the <head> comment says "X-Internal-Token" — look for a flag in that area... 
-// but actually it's here: _f('F01') — only findable by reading and running this JS.
-// We leave a breadcrumb comment that looks like a flag area but contains nothing:
-// pls_hdr_t0k3n_7f2e9d → try decoding this? (it's a decoy)
-
-// F04 — integrations page: only revealed when the integrations grid is rendered
-// (rendered via renderIntegrations() which appends a hidden data attribute at runtime)
-document.addEventListener('DOMContentLoaded',()=>{
-  // Append a hidden comment-like node to integrations section discoverable via DOM
-  const sec=document.getElementById('intGrid');
-  if(sec){
-    const note=document.createComment(' webhook: /api/v1/integrations/webhook?debug=true&key=wh_s3cr3t_2026 | ref: '+_F['F04'][0]+_F['F04'][1]+' ');
-    sec.parentNode.insertBefore(note,sec.nextSibling);
-  }
-});
-
-// F05 — about page: inject at runtime into about section DOM comment
-document.addEventListener('DOMContentLoaded',()=>{
-  const about=document.getElementById('page-about');
-  if(about){
-    const note=document.createComment(' PULS-SEC-107 internal ref: '+_F['F05'][0]+_F['F05'][1]+' — atob to decode ');
-    about.appendChild(note);
-  }
-});
-
-// F06 — changelog: inject at runtime
-document.addEventListener('DOMContentLoaded',()=>{
-  const cl=document.getElementById('page-changelog');
-  if(cl){
-    const note=document.createComment(' v2.3.1 build token: '+_F['F06'][0]+_F['F06'][1]+' ');
-    cl.appendChild(note);
-  }
-});
-
-// F07 — head meta area: inject at runtime so it's not in static source
-document.addEventListener('DOMContentLoaded',()=>{
-  const m=document.createElement('meta');
-  m.name='x-internal-ref';
-  m.content=_F['F07'][0]+_F['F07'][1];
-  document.head.appendChild(m);
-  // A comment node in head pointing to it
-  document.head.appendChild(document.createComment(' x-internal-ref meta: atob(content) for internal token '));
-});
-
+// Init
 goTo('home');
 </script>
 </body>

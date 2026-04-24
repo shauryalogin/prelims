@@ -1,0 +1,12 @@
+node_modules/
+npm-debug.log
+yarn-error.log
+.DS_Store
+
+# Ignore environment variables if you ever add a real one
+.env
+.env.local
+
+# Ignore the temporary scripts I created for the migration
+update_html.js
+fix_server.js
