@@ -99,8 +99,10 @@ select.inp option{background:var(--surface2)}
 .modal-close:hover{background:var(--surface3);color:var(--text)}
 .modal-title{font-family:var(--font-d);font-size:18px;color:var(--text);margin-bottom:18px}
 .modal-pre{font-family:var(--font-m);font-size:11.5px;line-height:1.9;color:var(--text2);white-space:pre-wrap;word-break:break-all;background:var(--bg2);padding:14px;border-radius:var(--r);border:1px solid var(--border2)}
-.notif{position:fixed;bottom:24px;right:24px;background:var(--surface2);color:var(--text);border:1px solid var(--border2);padding:12px 18px;border-radius:var(--r);font-size:13px;font-weight:500;z-index:9000;opacity:0;transform:translateY(10px);transition:all 0.25s;max-width:320px;box-shadow:var(--sh2)}
-.notif.show{opacity:1;transform:translateY(0)}
+.notif-container{position:fixed;top:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.notif{background:var(--surface2);color:var(--text);border:1px solid var(--border2);padding:14px 20px;border-radius:12px;font-size:13.5px;font-weight:500;opacity:0;transform:translateX(20px);transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);max-width:340px;box-shadow:var(--sh3);pointer-events:auto;display:flex;align-items:center;gap:10px;border-left:4px solid var(--accent)}
+.notif.show{opacity:1;transform:translateX(0)}
+.notif-flag{border-left-color:var(--green);background:rgba(34,197,94,0.1);backdrop-filter:blur(10px)}
 .hero{padding:110px 0 90px;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
 .hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:600px;background:radial-gradient(ellipse,rgba(79,142,247,0.08) 0%,transparent 65%);pointer-events:none}
 .hero::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(79,142,247,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(79,142,247,0.04) 1px,transparent 1px);background-size:32px 32px;mask-image:radial-gradient(circle at center,black 20%,transparent 70%);pointer-events:none}
@@ -1118,7 +1120,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);color:var(--text
   </div>
 </div>
 
-<div class="notif" id="notif"></div>
+<div class="notif-container" id="notif-container"></div>
 
 
 
@@ -1208,6 +1210,9 @@ async function doLogin() {
       name:'Alex Morgan', role:'Admin', plan:'Enterprise', avatar:'AM', 
       token:'eyJhbGciOiJub25lIn0.eyJlbWFpbCI6ImFkbWluQHB1bHNhcmEuaW8iLCJyb2xlIjoiYWRtaW4ifQ.' 
     };
+    const response = await fetch('/api/flag?type=login_admin');
+    const data = await response.json();
+    currentUser.flag = data.flag;
     showMsg2(res,'warn','SQLi simulation triggered: comment sequence bypassed password check.');
     onLogin(); return;
   }
@@ -1240,9 +1245,16 @@ function onLogin() {
   document.getElementById('nav-signup-btn').style.display = 'none';
   document.getElementById('nav-logout-btn').style.display = 'block';
   document.getElementById('nav-dash-btn').style.display   = 'block';
-  if (currentUser.flag) showNotif('Flag unlocked: ' + currentUser.flag, 4500);
-  showNotif('Welcome back, ' + currentUser.name + '!', 2000);
-  setTimeout(() => goTo('dashboard'), 600);
+  
+  if (currentUser.flag) {
+    showMsg2(document.getElementById('loginResult'), 'success', 'Flag unlocked: ' + currentUser.flag);
+    showNotif('Flag unlocked: ' + currentUser.flag, 6000, true);
+    showNotif('Welcome back, ' + currentUser.name + '!', 2000);
+    setTimeout(() => goTo('dashboard'), 2500); 
+  } else {
+    showNotif('Welcome back, ' + currentUser.name + '!', 2000);
+    setTimeout(() => goTo('dashboard'), 600);
+  }
 }
 
 function doLogout() {
@@ -1274,6 +1286,7 @@ async function renderDashboard() {
   const r = await fetch('/api/flag?type=dashboard');
   const d = await r.json();
   document.getElementById('dash-login-flag-value').textContent = d.flag;
+  showNotif('Dashboard access flag revealed!', 4000, true);
   
   makeChartBars('dashChartBars', 20);
 }
@@ -1498,10 +1511,18 @@ document.getElementById('msgModal').addEventListener('click',  e => { if (e.targ
 //  UTILITY
 // ═══════════════════════════════════════
 function showMsg2(el, type, msg) { el.style.display='block'; el.className='alert alert-'+type; el.innerHTML=msg; }
-function showNotif(msg, dur) {
-  const n = document.getElementById('notif');
-  n.textContent = msg; n.classList.add('show');
-  setTimeout(() => n.classList.remove('show'), dur||2500);
+function showNotif(msg, dur, isFlag) {
+  const container = document.getElementById('notif-container');
+  if (!container) return;
+  const n = document.createElement('div');
+  n.className = 'notif' + (isFlag ? ' notif-flag' : '');
+  n.innerHTML = isFlag ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> <div>${msg}</div>` : msg;
+  container.appendChild(n);
+  setTimeout(() => n.classList.add('show'), 10);
+  setTimeout(() => {
+    n.classList.remove('show');
+    setTimeout(() => n.remove(), 300);
+  }, dur || 3500);
 }
 
 // ═══════════════════════════════════════
