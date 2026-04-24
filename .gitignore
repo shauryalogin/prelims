@@ -10,3 +10,9 @@ yarn-error.log
 # Ignore the temporary scripts I created for the migration
 update_html.js
 fix_server.js
+update_sidebar.js
+update_overview*.js
+fix_js.js
+fix_index_*.js
+reset_script.js
+test.js

@@ -194,15 +194,18 @@ select.inp option{background:var(--surface2)}
 .login-form-sub{font-size:13.5px;color:var(--text3);margin-bottom:28px}
 .login-hint{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;font-size:11.5px;color:var(--text3);margin-top:18px;font-family:var(--font-m);line-height:1.6}
 .dash-layout{display:flex;min-height:calc(100vh - 110px)}
-.dash-sidebar{width:248px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:20px 12px;position:sticky;top:110px;height:calc(100vh - 110px);overflow-y:auto}
-.dash-sidebar-section{margin-bottom:24px}
-.dash-sidebar-header{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.4px;color:var(--text3);padding:0 10px;margin-bottom:6px}
+.dash-sidebar{width:260px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:24px 16px;position:sticky;top:110px;height:calc(100vh - 110px);overflow-y:auto}
+.dash-sidebar::-webkit-scrollbar{width:4px}
+.dash-sidebar::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:4px}
+.dash-sidebar-section{margin-bottom:32px}
+.dash-sidebar-header{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);padding:0 12px;margin-bottom:10px;opacity:0.8}
 .dash-sidebar ul{list-style:none}
-.dash-sidebar ul li a{display:flex;align-items:center;gap:10px;padding:9px 10px;font-size:13px;font-weight:500;color:var(--text3);text-decoration:none;border-radius:var(--r);transition:all 0.15s;cursor:pointer;margin-bottom:2px;border:1px solid transparent}
-.dash-sidebar ul li a:hover{color:var(--text);background:var(--surface)}
-.dash-sidebar ul li a.ds-active{color:var(--accent);background:var(--accent-lt);border-color:var(--accent-md)}
-.ds-icon{width:24px;height:24px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;letter-spacing:0.3px;font-family:var(--font-m);color:var(--text3);background:var(--surface2);border:1px solid var(--border);flex-shrink:0}
-.dash-sidebar ul li a.ds-active .ds-icon{color:var(--accent);background:var(--accent-lt);border-color:var(--accent-md)}
+.dash-sidebar ul li a{display:flex;align-items:center;gap:12px;padding:10px 14px;font-size:13.5px;font-weight:500;color:var(--text3);text-decoration:none;border-radius:10px;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);cursor:pointer;margin-bottom:4px;border:1px solid transparent}
+.dash-sidebar ul li a:hover{color:var(--text);background:rgba(255,255,255,0.03);transform:translateX(3px)}
+.dash-sidebar ul li a.ds-active{color:var(--text);background:linear-gradient(90deg, rgba(79,142,247,0.12), rgba(79,142,247,0.02));border-color:rgba(79,142,247,0.15);box-shadow:inset 3px 0 0 var(--accent)}
+.ds-icon{width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;color:var(--text3);flex-shrink:0;transition:all 0.2s}
+.dash-sidebar ul li a:hover .ds-icon{color:var(--text);transform:scale(1.1)}
+.dash-sidebar ul li a.ds-active .ds-icon{color:var(--accent)}
 .dash-main{flex:1;padding:32px;background:var(--bg)}
 .dash-panel{display:none}
 .dash-panel.ds-visible{display:block;animation:fadeUp 0.22s ease}
@@ -562,22 +565,22 @@ footer{background:var(--bg2);border-top:1px solid var(--border);color:var(--text
       <div class="dash-sidebar-section">
         <div class="dash-sidebar-header">Analytics</div>
         <ul>
-          <li><a onclick="showDashPanel('overview')"   id="ds-overview"   class="ds-active"><span class="ds-icon">OV</span> Overview</a></li>
-          <li><a onclick="showDashPanel('funnels')"    id="ds-funnels"><span class="ds-icon">FN</span> Funnels</a></li>
-          <li><a onclick="showDashPanel('retention')"  id="ds-retention"><span class="ds-icon">RT</span> Retention</a></li>
-          <li><a onclick="showDashPanel('reports')"    id="ds-reports"><span class="ds-icon">RP</span> Reports</a></li>
+          <li><a onclick="showDashPanel('overview')"   id="ds-overview"   class="ds-active"><span class="ds-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg></span> Overview</a></li>
+          <li><a onclick="showDashPanel('funnels')"    id="ds-funnels"><span class="ds-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></span> Funnels</a></li>
+          <li><a onclick="showDashPanel('retention')"  id="ds-retention"><span class="ds-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></span> Retention</a></li>
+          <li><a onclick="showDashPanel('reports')"    id="ds-reports"><span class="ds-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span> Reports</a></li>
         </ul>
       </div>
       <div class="dash-sidebar-section">
         <div class="dash-sidebar-header">Workspace</div>
         <ul>
-          <li><a onclick="showDashPanel('profile')"    id="ds-profile"><span class="ds-icon">PR</span> My Profile</a></li>
-          <li><a onclick="showDashPanel('team')"       id="ds-team"><span class="ds-icon">TM</span> Team</a></li>
-          <li><a onclick="showDashPanel('tokens')"     id="ds-tokens"><span class="ds-icon">AK</span> API Keys</a></li>
-          <li><a onclick="showDashPanel('userlookup')" id="ds-userlookup"><span class="ds-icon">UL</span> User Lookup</a></li>
-          <li><a onclick="showDashPanel('messages')"   id="ds-messages"><span class="ds-icon">IN</span> Inbox <span class="badge badge-red" style="margin-left:4px;font-size:9.5px">3</span></a></li>
-          <li><a onclick="showDashPanel('settings')"   id="ds-settings"><span class="ds-icon">ST</span> Settings</a></li>
-          <li><a onclick="showDashPanel('debug')"      id="ds-debug"><span class="ds-icon" style="color:var(--amber)">DB</span> <span style="color:var(--amber)">Debug Console</span></a></li>
+          <li><a onclick="showDashPanel('profile')"    id="ds-profile"><span class="ds-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> My Profile</a></li>
+          <li><a onclick="showDashPanel('team')"       id="ds-team"><span class="ds-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span> Team</a></li>
+          <li><a onclick="showDashPanel('tokens')"     id="ds-tokens"><span class="ds-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span> API Keys</a></li>
+          <li><a onclick="showDashPanel('userlookup')" id="ds-userlookup"><span class="ds-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><path d="M11 8v2"></path><path d="M11 14h.01"></path></svg></span> User Lookup</a></li>
+          <li><a onclick="showDashPanel('messages')"   id="ds-messages"><span class="ds-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span> Inbox <span class="badge badge-red" style="margin-left:4px;font-size:9.5px;padding:2px 6px">3</span></a></li>
+          <li><a onclick="showDashPanel('settings')"   id="ds-settings"><span class="ds-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Settings</a></li>
+          <li><a onclick="showDashPanel('debug')"      id="ds-debug"><span class="ds-icon" style="color:var(--amber)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 16.2A2 2 0 0 0 22 14v-4a2 2 0 0 0-2-2h-2V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2v2a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2h2z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg></span> <span style="color:var(--amber)">Debug Console</span></a></li>
         </ul>
       </div>
     </div>
@@ -590,12 +593,40 @@ footer{background:var(--bg2);border-top:1px solid var(--border);color:var(--text
           <button class="btn btn-secondary btn-sm">Export ↓</button>
         </div>
         <div class="stat-row">
-          <div class="stat-card"><div class="stat-card-label">MRR</div><div class="stat-card-value">$124K</div><div class="stat-card-delta delta-up">↑ 18.4% vs last month</div></div>
-          <div class="stat-card"><div class="stat-card-label">Active Users</div><div class="stat-card-value">12,841</div><div class="stat-card-delta delta-up">↑ 9.2%</div></div>
-          <div class="stat-card"><div class="stat-card-label">Churn Rate</div><div class="stat-card-value">2.1%</div><div class="stat-card-delta delta-down">↑ 0.3% (watch)</div></div>
-          <div class="stat-card"><div class="stat-card-label">NPS Score</div><div class="stat-card-value">72</div><div class="stat-card-delta delta-up">↑ 5 points</div></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <div class="stat-card-label">MRR</div>
+      <div class="stat-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+    </div>
+    <div class="stat-card-value">$124K</div>
+    <div class="stat-card-delta delta-up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>18.4% vs last month</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <div class="stat-card-label">Active Users</div>
+      <div class="stat-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+    </div>
+    <div class="stat-card-value">12,841</div>
+    <div class="stat-card-delta delta-up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>9.2%</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <div class="stat-card-label">Churn Rate</div>
+      <div class="stat-card-icon" style="color:var(--amber);background:rgba(245,158,11,0.1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+    </div>
+    <div class="stat-card-value">2.1%</div>
+    <div class="stat-card-delta delta-down"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>0.3% (watch)</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-header">
+      <div class="stat-card-label">NPS Score</div>
+      <div class="stat-card-icon" style="color:var(--green);background:rgba(34,197,94,0.1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
+    </div>
+    <div class="stat-card-value">72</div>
+    <div class="stat-card-delta delta-up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:4px"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>5 points</div>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
           <div class="card">
             <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:14px">Revenue — 30 Days</div>
             <div class="chart-bars" style="height:90px" id="dashChartBars"></div>
@@ -1088,6 +1119,8 @@ footer{background:var(--bg2);border-top:1px solid var(--border);color:var(--text
 </div>
 
 <div class="notif" id="notif"></div>
+
+
 
 
 <script>
